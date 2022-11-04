@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/haagor/orderMP/model"
 )
 
 func OrderHandler() http.Handler {
@@ -19,6 +21,11 @@ func OrderHandler() http.Handler {
 			return
 		}
 
-		fmt.Println(string(b))
+		order, err := model.StringToOrder(string(b))
+		if err != nil {
+			http.Error(writer, "Bad request Data.", 400)
+			return
+		}
+		fmt.Println(order)
 	})
 }
