@@ -5,7 +5,7 @@
 - Pour assumer un burst, j'ai implémenté un chanel simple sans limite pour augmenter la disponibilité. Le handler lit le ticket est l'envoie dans le chanel. n workers depilent ce chanel pour update la base de donnée. Si un ticket n'arrive pas à être traité je le print simplement dans la console. Ces tickets en erreurs pourraient être stockés pour aller jusqu'au bout de la consigne de n'en perdre aucun. 
 
 Voici ma stucture de donnée pour `orderdb`:
-![](https://github.com/haagor/orderMP/blob/db.png)
+![](https://github.com/haagor/orderMP/blob/main/db.png)
 
 Quelques points mis de côté :
 - tests
