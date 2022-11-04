@@ -2,11 +2,19 @@ package main
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
+	"runtime"
+	"sync"
+	"syscall"
 
+	"github.com/haagor/orderMP/adapter"
 	postgresDB "github.com/haagor/orderMP/adapter"
 	"github.com/haagor/orderMP/controller"
+	"github.com/haagor/orderMP/model"
 )
 
 func main() {
@@ -22,6 +30,44 @@ func main() {
 	defer db.Close()
 	dba := postgresDB.PostgresAdapter{db}
 
-	http.Handle("/ticket", controller.OrderHandler(dba))
+	workers := flag.Int("workers", runtime.NumCPU(), "workers")
+	flag.Parse()
+
+	ordersChan := make(chan string, 0)
+	var wg sync.WaitGroup
+
+	go func(wg *sync.WaitGroup) {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+		<-c
+		close(ordersChan)
+		wg.Wait()
+		panic(1)
+	}(&wg)
+
+	for i := 0; i < *workers; i++ {
+		go processOrder(ordersChan, dba, &wg)
+	}
+
+	http.Handle("/ticket", controller.OrderHandler(ordersChan, dba))
 	http.ListenAndServe(":8080", nil)
+}
+
+func processOrder(ordersChan chan string, pa adapter.PostgresAdapter, wg *sync.WaitGroup) {
+	wg.Add(1)
+	defer wg.Done()
+
+	for s := range ordersChan {
+		order, err := model.StringToOrder(s)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		err = pa.AddOrderWithProduct(order)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
 }

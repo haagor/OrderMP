@@ -16,7 +16,7 @@ type Product struct {
 func StringToProduct(s string) (Product, error) {
 	l := strings.Split(s, ",")
 	if len(l) != 3 {
-		return Product{}, errors.New("not a valid product")
+		return Product{}, errors.New("not valid product")
 	}
 
 	price, err := strconv.ParseFloat(strings.TrimSuffix(l[2], "\n"), 64)
