@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	http.Handle("/ticket", controller.TicketHandler())
+	http.Handle("/ticket", controller.OrderHandler())
 	http.ListenAndServe(":8080", nil)
 }
