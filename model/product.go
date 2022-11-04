@@ -7,9 +7,9 @@ import (
 )
 
 type Product struct {
-	id    string
-	name  string
-	price float64
+	ProductID string
+	Name      string
+	Price     float64
 }
 
 // string înput format : product,product_id,price
@@ -24,6 +24,6 @@ func StringToProduct(s string) (Product, error) {
 		return Product{}, err
 	}
 
-	p := Product{id: l[0], name: l[1], price: price}
+	p := Product{ProductID: l[0], Name: l[1], Price: price}
 	return p, nil
 }
