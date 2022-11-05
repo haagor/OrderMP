@@ -26,6 +26,9 @@ func OrderHandler(ordersChan chan string, pa adapter.PostgresAdapter) http.Handl
 			fmt.Println(string(b) + "\n")
 			writer.WriteHeader(http.StatusOK)
 			return
+		default:
+			http.Error(writer, "Internal Server Error.", 500)
+			return
 		}
 	})
 }
