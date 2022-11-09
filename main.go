@@ -60,13 +60,13 @@ func processOrder(ordersChan chan string, pa adapter.PostgresAdapter, wg *sync.W
 	for s := range ordersChan {
 		order, err := model.StringToOrder(s)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Printf("failed to convert order to string: %s\n", err)
 			return
 		}
 
 		err = pa.AddOrderWithProduct(order)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Printf("failed to add new order to db: %s\n", err)
 			return
 		}
 	}

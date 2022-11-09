@@ -2,7 +2,7 @@ package model
 
 import (
 	"bufio"
-	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -26,7 +26,7 @@ Café,IZ8z,2
 func StringToOrder(s string) (Order, error) {
 	l := strings.Split(s, "\n\nproduct,product_id,price\n")
 	if len(l) != 2 {
-		return Order{}, errors.New("not valid order")
+		return Order{}, fmt.Errorf("StringToOrder: error wrong order format")
 	}
 	header := l[0]
 	products := l[1]
@@ -34,25 +34,25 @@ func StringToOrder(s string) (Order, error) {
 	var headerValue []string
 	lines := strings.Split(header, "\n")
 	if len(lines) != 3 {
-		return Order{}, errors.New("not valid header order")
+		return Order{}, fmt.Errorf("StringToOrder: error wrong order header format")
 	}
 
 	for _, line := range lines {
 		parsedLine := strings.Split(line, " ")
 		if len(parsedLine) != 2 {
-			return Order{}, errors.New("not valid header order")
+			return Order{}, fmt.Errorf("StringToOrder: error wrong order header line format")
 		}
 		headerValue = append(headerValue, parsedLine[1])
 	}
 
 	vat, err := strconv.ParseFloat(headerValue[1], 64)
 	if err != nil {
-		return Order{}, err
+		return Order{}, fmt.Errorf("StringToOrder: error parse float VAT: %w", err)
 	}
 
 	totalPrice, err := strconv.ParseFloat(headerValue[2], 64)
 	if err != nil {
-		return Order{}, err
+		return Order{}, fmt.Errorf("StringToOrder: error parse float totalPrice: %w", err)
 	}
 
 	order := Order{OrderID: headerValue[0], VAT: vat, TotalPrice: totalPrice}
@@ -61,7 +61,7 @@ func StringToOrder(s string) (Order, error) {
 	for scanner.Scan() {
 		p, err := StringToProduct(scanner.Text())
 		if err != nil {
-			return Order{}, err
+			return Order{}, fmt.Errorf("StringToOrder: error convert product to string: %w", err)
 		}
 		order.Products = append(order.Products, p)
 	}
